@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Stock Database </title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container" style="width: 650px;">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="text-center">Stock Database</h1>
+          <hr/>
+          <br/>
+          <div id="loader">
+            <p class="text-center">Loading...</p>
+          </div>
+          <div id="content" style="display: none;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Stock</th>
+                  <th scope="col">userId</th>
+                  <th scope="col">Recipe</th>
+                
+                </tr>
+              </thead>
+              <tbody id="candidatesResults">
+              </tbody>
+            </table>
+            <hr/>
+            <form onSubmit="App.addStock(); return false;">
+              <div class="form-group">
+                <label for="candidatesSelect">Select Stock to add</label>
+                <select class="form-control" id="candidatesSelect">
+                </select>
+                <label for="stock">Stock</label><br>
+                <input type="number" id="stock" name="stock">
+              </div>
+              <button type="submit" class="btn btn-primary">Add</button>
+              <hr />
+            </form>
+            <form onSubmit="App.addItem(); return false;">
+              <label for="name">Name</label><br>
+              <input type="text" id="itemName" name="name"><br>
+              <label for="stock_addItem">Stock</label><br>
+              <input type="number" id="stock_addItem" name="stock">
+
+              <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+            
+            <form onSubmit="App.transferItem(); return false;">
+              <div class="form-group">
+                <label for="transferItemSelect">Select Stock to create</label>
+                <select class="form-control" id="transferItemSelect">
+                </select>
+                <label for="stockTransfer">Stock</label><br>
+                <input type="number" id="stockTransfer" name="stock">
+              </div>
+              <button type="submit" class="btn btn-primary">Add</button>
+              <hr />
+            </form>
+
+
+            <p id="accountAddress" class="text-center"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="stock-recipe-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Stock Recipes: <span id="stock-detail-name"></span></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Recipe:
+            <div id="stock-detail-recipe"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
