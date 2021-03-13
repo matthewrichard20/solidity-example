@@ -26,11 +26,11 @@ App = {
   },
 
   initContract: function() {
-    $.getJSON("Election.json", function(election) {
+    $.getJSON("SupplyChain.json", function(SupplyChain) {
       // Instantiate a new truffle contract from the artifact
-      App.contracts.Election = TruffleContract(election);
+      App.contracts.SupplyChain = TruffleContract(SupplyChain);
       // Connect provider to interact with contract
-      App.contracts.Election.setProvider(App.web3Provider);
+      App.contracts.SupplyChain.setProvider(App.web3Provider);
 
       App.listenForEvents();
 
@@ -40,7 +40,7 @@ App = {
 
   // Listen for events emitted from the contract
   listenForEvents: function() {
-    App.contracts.Election.deployed().then(function(instance) {
+    App.contracts.SupplyChain.deployed().then(function(instance) {
       // Restart Chrome if you are unable to receive this event
       // This is a known issue with Metamask
       // https://github.com/MetaMask/metamask-extension/issues/2393
@@ -60,7 +60,7 @@ App = {
   },
 
   render: function() {
-    var electionInstance;
+    var SupplyChainInstance;
     var loader = $("#loader");
     var content = $("#content");
     isAdding = false;
@@ -77,15 +77,15 @@ App = {
     });
 
     // Promise.all([
-    //   electionInstance.itemCount(),
+    //   SupplyChainInstance.itemCount(),
 
     // ]).then(response, function(){
 
     // })
     // Load contract data
-    App.contracts.Election.deployed().then(function(instance) {
-      electionInstance = instance;
-      return electionInstance.itemCount();
+    App.contracts.SupplyChain.deployed().then(function(instance) {
+      SupplyChainInstance = instance;
+      return SupplyChainInstance.itemCount();
     }).then(function(itemCount) {
 
       var itemResults = $("#candidatesResults");
@@ -100,38 +100,52 @@ App = {
       console.log("itemCount:", itemCount);
       for (var i = 1; i <= itemCount; i++) {
         $("#candidatesResults").empty();
-        electionInstance.items(i).then(function(item) {
-          console.log("masuk")
-          
+        SupplyChainInstance.items(i).then(function(item) {
+
+        //   uint id;
+        // uint itemTypeId;
+        // address userId;
+        // uint[] recipe;
+        // uint [] usedBy;
+        // uint256 timestamp;
+        // bool isUsed;
+
+
+
+
+
           var id = item[0];
-          var name;
-          electionInstance.getItemType(item[1].c).then(function(_name)
-          {
-
-            name = _name;
-
-          }
-          
-          
-          )
-          
-
+          var itemTypeId = item[1];
           var userId = item[2];
-          var recipe0 = item[3];
-          var recipe1 = item[4];
-          var recipe2 = item[5];
-          var usedBy = item[6];
-          var recipe = [] ;
-          var recipeId = [] ;
+          var recipe = item[3];
+          var usedBy = item[4];
+          var timestamp = item[5];
+          var isUsed = item[6];
+          var itemName ;
+          var tempRecipe;
+          console.log("ts : ", timestamp);
+          for (var tes=0; tes<= 6 ; tes++){
+            console.log("test ", tes , " : ", item[tes] );
+          }
 
           Promise.all([
-            // electionInstance.getItemType(recipe0.itemTypeId),
-            // electionInstance.getItemType(recipe1.itemTypeId),
-            // electionInstance.getItemType(recipe2.itemTypeId)
+            SupplyChainInstance.getItemNames(item[1].c[0])
+          ]).then(function (_names){
+            console.log("ini nama: ",_names);
+            itemName = _names[0];
+            console.log("testing Nama: " , itemName)
+          });
+
+          var tempRecipe; // try Wahyu code
+          var recipeId;
+          Promise.all([
+            SupplyChainInstance.getItemNames(recipe.c[0]) //,
+            // SupplyChainInstance.getItemNames(item[5].c[0]),
+            // SupplyChainInstance.getItemNames(item[6].c[0])
           ]).then(function (itemNames) {
             for(var l = 0; l < itemNames.length; l++){
               if(itemNames[l]){
-                recipe.push(itemNames[l]);
+                tempRecipe.push(itemNames[l]);
                 recipeId.push({
                   id: item[l + 4],
                   names: itemNames[l]
@@ -140,13 +154,17 @@ App = {
             }
 
 
-            var recipeName = recipe.join(",");
+            // var recipeName = tempRecipe.join(",");
+            var recipeName = "test";
+            var recipeObj = "test";
             var recipeObj = JSON.stringify(recipeId);
 
 
             // Render candidate Result
             
-            var candidateTemplate = "<tr><th>" + id + "</th><td><a class='stock-item' id='stock-"+ id +"' data-recipe='"+ recipeObj +"' data-name='"+ name +"' data-id='"+ id +"'>" + name + "</a></td><td>" + stock + "</td><td>" + userId + "</td><td>" + recipeName +"</td></tr>" 
+             
+            // var candidateTemplate = "<tr><th>" + id + "</th><td>" + itemName + "</td><td>" + userId + "</td></tr>"
+            var candidateTemplate = "<tr><th>" + id + "</th><td><a class='stock-item' id='stock-"+ id +"' data-recipe='"+ recipeObj +"' data-name='"+ itemName +"' data-id='"+ id +"'>" + name + "</a></td><td>" + stock + "</td><td>" + userId + "</td><td>" + recipeName +"</td></tr>" 
             itemResults.append(candidateTemplate);
 
             // Render candidate ballot option
@@ -154,6 +172,7 @@ App = {
             itemSelect.append(candidateOption);
             itemSelectTransfer.append(candidateOption);
 
+            console.log("ts akhir : ", timestamp);
             App.initStockModal();
             
           });
@@ -161,7 +180,7 @@ App = {
       }
 
 
-      return electionInstance.voters(App.account);
+      return SupplyChainInstance.voters(App.account);
     }).then(function(hasVoted) {
       // Do not allow a user to vote
       if(hasVoted) {
@@ -193,7 +212,7 @@ App = {
     var itemId = $('#candidatesSelect').val();
     var stock = $('#stock').val();
 
-    App.contracts.Election.deployed().then(function(instance) {
+    App.contracts.SupplyChain.deployed().then(function(instance) {
       isAdding = true;
       return instance.addStock(itemId,stock, { from: App.account });
     }).then(function(result) {
@@ -209,7 +228,7 @@ App = {
     var name = $('#itemName').val();
     var stock_addItem = $('#stock_addItem').val();
     
-    App.contracts.Election.deployed().then(function(instance) {
+    App.contracts.SupplyChain.deployed().then(function(instance) {
       isAdding = true;
       return instance.addItem(name, stock_addItem , { from: App.account , gas: 1000000} );
     }).then(function(result) {
@@ -226,7 +245,7 @@ App = {
     var itemId = $('#transferItemSelect').val();
     var stock = $('#stockTransfer').val();
 
-    App.contracts.Election.deployed().then(function(instance) {
+    App.contracts.SupplyChain.deployed().then(function(instance) {
       isAdding = true;
       return instance.buyTransaction(itemId,stock, { from: App.account });
     }).then(function(result) {
@@ -242,7 +261,7 @@ App = {
     var itemId = $('#transferItemSelect').val();
     var stock = $('#stockTransfer').val();
 
-    App.contracts.Election.deployed().then(function(instance) {
+    App.contracts.SupplyChain.deployed().then(function(instance) {
       isAdding = true;
       return instance.buyTransaction(itemId,stock, { from: App.account });
     }).then(function(result) {

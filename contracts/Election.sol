@@ -1,6 +1,6 @@
 pragma solidity >=0.4.20;
 
-contract Election {
+contract SupplyChain {
     // Model a Candidate
     struct Company {
         uint id;
@@ -8,30 +8,32 @@ contract Election {
         string name;
     }
 
-    struct Candidate {
-        uint id;
-        string name;
-        uint voteCount;
-    }
-
     struct Item{
         uint id;
         uint itemTypeId;
         address userId;
-        // uint[3] recipe;
-        uint recipe0;
-        uint recipe1;
-        uint recipe2;
-        uint usedBy;
-        uint256 timestamp;
+        uint[] recipe;
+        uint [] usedBy;
+        uint timestamp;
         bool isUsed;
+
+    }
+
+    struct Transfer{
+        uint id;
+        uint itemId;
+        address senderId;
+        address receiverId;
+        bool isConfirmed;
 
     }
 
     mapping(uint => Item) public items;
     mapping(uint => Company) public companies;
+    mapping(uint => Transfer) public transfers;
     uint public itemCount;
     uint public companyCount;
+    uint public transferCount;
     uint [][] companyStock; //indeks pertama id company, indeks kedua id itemType
     
     mapping(uint => string ) public itemType;
@@ -42,10 +44,12 @@ contract Election {
     // buat item yang awal, tanpa recipe
     function addItem ( uint  itemTypeId, int _stock 
                         ) public {
-       
+        uint[] memory recipe;
+        uint[] memory usedBy;
+        uint timestamp = block.timestamp;
         for (int i= 0;i< _stock; i++){
             itemCount++;
-            items[itemCount] = Item(itemCount, itemTypeId, msg.sender, 0, 0, 0 , 0 , block.timestamp, false);
+            items[itemCount] = Item(itemCount, itemTypeId, msg.sender, recipe, usedBy , timestamp, false);
         }
 
                             
@@ -53,56 +57,82 @@ contract Election {
        emit votedEvent(0);
     }
 
-    function createItem ( uint itemTypeId ,uint _recipe0, uint _recipe1, uint _recipe2
+    function createItem ( uint [] memory itemTypeId ,uint [] memory recipe
                         ) public {
-        require(msg.sender == items[_recipe0].userId && msg.sender == items[_recipe1].userId && msg.sender == items[_recipe2].userId);   
-        require( !(items[_recipe0].isUsed) && !(items[_recipe1].isUsed) && !(items[_recipe2].isUsed));   
 
-        itemCount++;
-        items[itemCount] = Item(itemCount, itemTypeId, msg.sender, _recipe0 , _recipe1, _recipe2 , 0 , block.timestamp, false);
+        bool isValid = true;  
+        bool _isUsed = false;                 
+        for(uint i=0 ; i< recipe.length ; i++){
+            isValid = isValid && (items[recipe[i]].userId == msg.sender);
+            _isUsed = _isUsed && (items[recipe[i]].isUsed);
 
-        items[_recipe0].isUsed = true;
-        items[_recipe1].isUsed = true;
-        items[_recipe2].isUsed = true;
-        items[_recipe0].usedBy = itemTypeId;
-        items[_recipe1].usedBy = itemTypeId;
-        items[_recipe2].usedBy = itemTypeId;
+        }
 
+        require(isValid && !(_isUsed));   
+
+        for(uint j=0 ; j< itemTypeId.length ; j++){
+            itemCount++;
+            uint [] memory usedBy;
+            items[itemCount] = Item(itemCount, itemTypeId[j], msg.sender, recipe , usedBy , block.timestamp, false);
+            for(uint k=1; k<= recipe.length;k++){
+                items[recipe[k]].isUsed = true;
+                items[recipe[k]].usedBy.push(itemCount);
+            }
+        }
         emit votedEvent(0);
     }
 
-    // function addStock(uint _item, int stock) public{
+    function sendItem(address _receiverId, uint _item) public {
 
-    //     require(msg.sender == items[_item].userId );
-
-    //     items[_item].stock += stock;
-    //     emit votedEvent(0);
-    // }
-
-    function buyItem(uint _item) public {
-
+        require(msg.sender == items[_item].userId);
         require( !(items[_item].isUsed));
 
-        itemCount++;
-        items[itemCount] = Item(itemCount, items[_item].itemTypeId, msg.sender, items[_item].recipe0 , items[_item].recipe1, items[_item].recipe2 , 0 , block.timestamp, false);
+        transferCount++;
+        transfers[transferCount] = Transfer(transferCount,_item, msg.sender, _receiverId, false);
+        emit votedEvent(0);
+    }
+
+
+    function receiveItem(uint transferId) public {
         
-        items[_item].usedBy = itemCount;
-        items[_item].isUsed = true;
+        Transfer memory temp = transfers[transferId];
+
+        require(msg.sender == temp.receiverId);
+        require( !(items[temp.itemId].isUsed));
+
+        uint[] memory recipe;
+        uint[] memory usedBy;
+        
+        itemCount++;
+        items[itemCount] = Item(itemCount, items[temp.itemId].itemTypeId, msg.sender, recipe,  usedBy , block.timestamp, false);
+        items[itemCount].recipe.push(temp.itemId);
+
+        items[temp.itemId].usedBy.push(itemCount);
+        items[temp.itemId].isUsed = true;
+
+        transfers[transferId].isConfirmed = true;
 
         emit votedEvent(0);
     }
 
 
-    function getItemType(uint _item) public view returns(string memory _name )  {
-        _name =  itemType[_item];
+    function getItemNames(uint _item) public view returns(string memory _name )  {
+
+        if (_item == 0) {
+            _name = "nothing";
+
+        } else {
+            _name =  itemType[_item];
+        }
+        
     }
-    function traceProduct(uint _item) public view returns( uint _recipe0 , uint  _recipe1, uint _recipe2, uint _usedBy ) {
+    
+    function traceProduct(uint _item) public  returns( uint [] memory _recipe , uint [] memory _usedBy ) {
 
-        _recipe0 = items[_item].recipe0;
-        _recipe1 = items[_item].recipe1;
-        _recipe2 = items[_item].recipe2;
+        _recipe = items[_item].recipe;
         _usedBy = items[_item].usedBy;
-
+        
+        emit votedEvent(0);
     }
 
     function addNewType(string memory name) public{
@@ -111,23 +141,14 @@ contract Election {
         itemType[itemTypeCount] = name;
     }
 
-    // Store accounts that have voted
-    mapping(address => bool) public voters;
-    // Store Candidates
-    // Fetch Candidate
-    mapping(uint => Candidate) public candidates;
-    // Store Candidates Count
-    uint public candidatesCount;
-
-    // voted event
-    event votedEvent (
-        uint indexed _candidateId
-    );
-
+    function getItemCount() public view returns (uint _itemCount){
+        _itemCount = itemCount;
+    }
+ 
     constructor () public {
         
-        addNewType("Sapi");
-        addItem(1,1);
+        // addNewType("Sapi");
+        // addItem(1,1);
         // addItem("kodok", 2);
         // addItem("sapi", 2);
         // addItem("ayam", 2);
@@ -136,25 +157,5 @@ contract Election {
         // addItem2("paket 1", 2, 4,5,3);
     }
 
-    function addCandidate (string memory _name) private {
-        candidatesCount ++;
-        candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);
-    }
-
-    function vote (uint _candidateId) public {
-        // require that they haven't voted before
-        require(!voters[msg.sender]);
-
-        // require a valid candidate
-        require(_candidateId > 0 && _candidateId <= candidatesCount);
-
-        // record that voter has voted
-        //voters[msg.sender] = true;
-
-        // update candidate vote Count
-        candidates[_candidateId].voteCount ++;
-
-        // trigger voted event
-        emit votedEvent(_candidateId);
-    }
+    
 }
