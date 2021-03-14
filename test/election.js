@@ -28,9 +28,36 @@ contract('solidity-example', function(accounts) {
       assert(result == 0);
 
     });
-  });
 
   
+
+  });
+
+  it('Should deposit token correctly' , async()=>{
+    const solidityContract = await SolidityExample.deployed();
+    await solidityContract.depositToken(1);
+    const result = await solidityContract.getBalance();
+    assert(result.toNumber()== 1 );
+
+  });
+
+  it('Should add Counter correctly' , async()=>{
+    const solidityContract = await SolidityExample.deployed();
+    await solidityContract.addCount(1);
+    const result = await solidityContract.getCounter();
+    assert(result.toNumber()== 1 );
+
+  });
+
+  it('Should withdraw correctly' , async()=>{
+    const solidityContract = await SolidityExample.deployed();
+    await solidityContract.depositToken(2);
+    await solidityContract.addCount(11);
+    await solidityContract.withdrawToken(1);
+    const result = await solidityContract.getBalance();
+    assert(result.toNumber()=== 2 );
+
+  });
 });
   
 
