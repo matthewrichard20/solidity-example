@@ -24,79 +24,44 @@
           <h1 class="text-center">Stock Database</h1>
           <hr/>
           <br/>
-          <div id="loader">
-            <p class="text-center">Loading...</p>
-          </div>
-          <div id="content" style="display: none;">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Company</th>
-                  <th scope="col">Recipe</th>
-                  <th scope="col">Action</th>
-                
-                </tr>
-              </thead>
-              <tbody id="candidatesResults">
-              </tbody>
-            </table>
+
+          <p id="accountAddress" class="text-center"></p>
+          <label>Balance </label>
+          <p id=balanceResult></p>
+          <label>count: </label>
+          <p id=counter></p>
             <hr/>
-            <form onSubmit="App.addStock(); return false;">
+
+            <form onSubmit="App.depositToken(); return false;">
               <div class="form-group">
-                <label for="candidatesSelect">Select Stock to add</label>
-                <select class="form-control" id="candidatesSelect">
-                </select>
-                <label for="stock">Stock</label><br>
-                <input type="number" id="stock" name="stock">
+                <label for="candidatesSelect">Deposit Token</label>
+                <input type="number" id="depositValue" step=".1" name="stock">
               </div>
-              <button type="submit" class="btn btn-primary">Add</button>
+              <button type="submit" class="btn btn-primary">Submit</button>
               <hr />
             </form>
-            <form onSubmit="App.addItem(); return false;">
-              <label for="name">Name</label><br>
-              <input type="text" id="itemName" name="name"><br>
-              <label for="stock_addItem">Stock</label><br>
-              <input type="number" id="stock_addItem" name="stock">
 
-              <button type="submit" class="btn btn-primary">Add</button>
+            <form onSubmit="App.withdrawToken(); return false;">
+              <div class="form-group">
+                <label for="candidatesSelect">Withdraw Token</label>
+                <input type="number" id="withdrawValue" step=".1" name="stock">
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <hr />
             </form>
             
-            <form onSubmit="App.transferItem(); return false;">
+            <form onSubmit="App.addCount(); return false;">
               <div class="form-group">
-                <label for="transferItemSelect">Select Stock to create</label>
-                <select class="form-control" id="transferItemSelect">
-                </select>
-                <label for="stockTransfer">Stock</label><br>
-                <input type="number" id="stockTransfer" name="stock">
+                <label for="candidatesSelect">Add Count</label>
+                <input type="number" id="countValue" name="stock">
               </div>
-              <button type="submit" class="btn btn-primary">Add</button>
+              <button type="submit" class="btn btn-primary">Submit</button>
               <hr />
             </form>
 
 
-            <p id="accountAddress" class="text-center"></p>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="modal fade" id="stock-recipe-modal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Stock Recipes: <span id="stock-detail-name"></span></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            Recipe:
-            <div id="stock-detail-recipe"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            
           </div>
         </div>
       </div>

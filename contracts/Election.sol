@@ -2,6 +2,54 @@ pragma solidity >=0.4.20;
 
 contract SupplyChain {
     // Model a Candidate
+    // 0.1 equal to 1 in data
+    
+
+    /* This creates an array with all balances */
+    mapping (address => uint256) public balanceOf;
+    uint256 counter;
+    /* Initializes contract with initial supply tokens to the creator of the contract */
+    function MyToken(
+        uint256 initialSupply
+        ) public {
+        balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
+    }
+
+
+    function depositToken(uint256 depositAmount) public {
+        uint256 minimumDeposit = 1;
+        require(depositAmount >=  minimumDeposit ) ;
+        balanceOf[msg.sender] += depositAmount;
+
+    }
+
+    function getBalance () public view returns(uint256  _balance ) {
+        _balance = balanceOf[msg.sender];
+    }
+
+    function getCounter () public view returns(uint256  _balance ) {
+        _balance = counter;
+    }
+
+    function addCount(uint256 _count) public {
+        counter += _count;
+
+    }
+
+    function withdrawToken(uint256 withdrawAmmount) public {
+        
+        
+        require(counter > 10);
+        require((balanceOf[msg.sender]- withdrawAmmount) > 0 );
+        balanceOf[msg.sender] -= withdrawAmmount ;
+    }
+
+
+    constructor () public {
+        balanceOf[msg.sender] = 0;
+
+    }
+
     struct Company {
         uint id;
         address addressCompany;
@@ -27,6 +75,10 @@ contract SupplyChain {
         bool isConfirmed;
 
     }
+
+    event votedEvent (
+        uint indexed _candidateId
+    );
 
     mapping(uint => Item) public items;
     mapping(uint => Company) public companies;
@@ -145,17 +197,7 @@ contract SupplyChain {
         _itemCount = itemCount;
     }
  
-    constructor () public {
-        
-        // addNewType("Sapi");
-        // addItem(1,1);
-        // addItem("kodok", 2);
-        // addItem("sapi", 2);
-        // addItem("ayam", 2);
-        // addItem2("nasi goreng", 2, 1,2,3);
-        // addItem2("nasi bakar", 2, 4,2,3);
-        // addItem2("paket 1", 2, 4,5,3);
-    }
+    
 
     
 }
