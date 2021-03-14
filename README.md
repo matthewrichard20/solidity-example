@@ -1,5 +1,5 @@
 ## Dependencies
-Install these prerequisites to follow along with the tutorial. See free video tutorial or a full explanation of each prerequisite.
+Install these prerequisites
 - NPM: https://nodejs.org
 - Truffle: https://github.com/trufflesuite/truffle
 - Ganache: http://truffleframework.com/ganache/
@@ -15,7 +15,7 @@ $ cd solidity-example
 $ npm install
 ```
 ## Step 3. Start Ganache
-Open the Ganache GUI client that you downloaded and installed. This will start your local blockchain instance. See free video tutorial for full explanation.
+Open the Ganache GUI client that you downloaded and installed. This will start your local blockchain instance.
 
 
 ## Step 4. Compile & Deploy Smart Contract
