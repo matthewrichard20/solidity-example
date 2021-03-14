@@ -7,7 +7,7 @@ contract SupplyChain {
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
-    uint256 counter;
+    uint256 public counter;
 
     function depositToken(uint256 depositAmount) public {
         uint256 minimumDeposit = 1;

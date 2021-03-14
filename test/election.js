@@ -41,6 +41,18 @@ contract('solidity-example', function(accounts) {
 
   });
 
+  it('Should withdraw token fail' , async()=>{
+    const solidityContract = await SolidityExample.deployed();
+    try {
+      await solidityContract.withdrawToken(1);
+    } catch(e){
+      
+      return;
+    }
+    assert(false);
+
+  });
+
   it('Should add Counter correctly' , async()=>{
     const solidityContract = await SolidityExample.deployed();
     await solidityContract.addCount(1);
@@ -58,6 +70,20 @@ contract('solidity-example', function(accounts) {
     assert(result.toNumber()=== 2 );
 
   });
+
+  it('Should deposit token fail' , async()=>{
+    const solidityContract = await SolidityExample.deployed();
+    try {
+      await solidityContract.depositToken(0.1);
+    } catch(e){
+
+      return;
+    }
+    assert(false);
+
+  });
+
+  
 });
   
 
