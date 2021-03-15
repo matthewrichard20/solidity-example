@@ -16,8 +16,8 @@ contract SupplyChain {
 
     }
 
-    function getBalance() public view returns(uint256  _balance ) {
-        _balance = balanceOf[msg.sender];
+    function getBalance(address account) public view returns(uint256  _balance ) {
+        _balance = balanceOf[account];
     }
 
     function getCounter () public view returns(uint256  _balance ) {
